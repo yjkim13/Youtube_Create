@@ -14,6 +14,7 @@ function VideoDetailPage(props) {
     const variable = { videoId: videoId }
 
     const [videoDetail, setVideoDetail] = useState([])
+    const [comment, setComment] = useState([])
 
     useEffect(() => {
 
@@ -26,39 +27,53 @@ function VideoDetailPage(props) {
                     alert('비디오 정보를 가져오는데 실패했습니다.')
                 }
             })
+
+        Axios.post('/api/comment/getComment', variable)
+            .then(response => {
+                if (response.data.success) {
+                    setComment(response.data.comment)
+
+                } else {
+                    alert('코멘트 정보를 가져오는데 실패했습니다.')
+                }
+            })
     }, [])
+
+    const refreshFunction = (newComment) => {
+        setComment(comment.concat(newComment))
+    }
 
     if (videoDetail.writer) {
 
-        const subscribeButton = videoDetail.writer._id !== localStorage.getItem('userId') && <Subscribe userTo={videoDetail.writer._id} userFrom={localStorage.getItem('userId')}/>
-            return (
-                <Row gutter={[16, 16]}>
-                    <Col lg={18} xs={24}>
+        const subscribeButton = videoDetail.writer._id !== localStorage.getItem('userId') && <Subscribe userTo={videoDetail.writer._id} userFrom={localStorage.getItem('userId')} />
+        return (
+            <Row gutter={[16, 16]}>
+                <Col lg={18} xs={24}>
 
-                        <div style={{ width: '100%', padding: '3rem 4rem' }}>
-                            <video style={{ width: '100%' }} src={`http://localhost:5000/${videoDetail.filePath}`} controls />
+                    <div style={{ width: '100%', padding: '3rem 4rem' }}>
+                        <video style={{ width: '100%' }} src={`http://localhost:5000/${videoDetail.filePath}`} controls />
 
-                            <List.Item
-                                actions={[subscribeButton]}
-                            >
-                                <List.Item.Meta
-                                    avatar={<Avatar src={videoDetail.writer.image} />}
-                                    title={videoDetail.writer.name}
-                                    description={videoDetail.description}
-                                />
-                            </List.Item>
+                        <List.Item
+                            actions={[subscribeButton]}
+                        >
+                            <List.Item.Meta
+                                avatar={<Avatar src={videoDetail.writer.image} />}
+                                title={videoDetail.writer.name}
+                                description={videoDetail.description}
+                            />
+                        </List.Item>
 
-                            {/* Comments */}
-                            <Comment postId={videoId}/>
-                        </div>
+                        {/* Comments */}
+                        <Comment refreshFunction={refreshFunction} commentList={comment} postId={videoId} />
+                    </div>
 
-                    </Col>
-                    <Col lg={6} xs={24}>
-                        <SideVideo />
-                    </Col>
+                </Col>
+                <Col lg={6} xs={24}>
+                    <SideVideo />
+                </Col>
 
-                </Row>
-            )
+            </Row>
+        )
 
     } else {
         return (
