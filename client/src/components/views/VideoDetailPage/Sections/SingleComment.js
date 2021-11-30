@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 import { Comment, Avatar, Button, Input } from 'antd'
-import { getInputClassName } from 'antd/lib/input/Input'
 import { useSelector } from 'react-redux'
 import Axios from 'axios'
+import LikeDislikes from './LikeDislikes'
 
-const { TextArea } = getInputClassName
+const { TextArea } = Input;
 function SingleComment(props) {
 
     const videoId = props.postId
@@ -46,8 +46,8 @@ function SingleComment(props) {
             })
     }
 
-    const actions = [
-        <span onClick={onClickReplyOpen} key="comment-basic-reply-to">Reply to</span>
+    const actions = [<LikeDislikes userId={localStorage.getItem('userId')} commentId={props.comment._id} />,
+    <span onClick={onClickReplyOpen} key="comment-basic-reply-to">Reply to</span>
     ]
 
     return (
@@ -60,14 +60,14 @@ function SingleComment(props) {
             />
             {openReply &&
                 <form style={{ display: 'flex' }} onSubmit={onSubmit} >
-                    <textarea
+                    <TextArea
                         style={{ width: '100%', borderRadius: '5px' }}
                         onChange={onHandleChange}
                         value={commentValue}
                         placeholder="답글을 작성해주세요."
                     />
                     <br />
-                    <button style={{ width: '20%', height: '52px' }} onClick={onSubmit}> Submit </button>
+                    <Button style={{ width: '20%', height: '52px' }} onClick={onSubmit}> Submit </Button>
                 </form>
             }
 
